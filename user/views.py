@@ -96,6 +96,14 @@ def login_view(request):
         return resp
 
 def logout_view(request):
-    
-    return HttpResponseRedirect('/index')
+    resq=HttpResponseRedirect('/index')
+    resq.delete_cookie('username')
+    resq.delete_cookie('uid')
+
+    if request.session['uid']:
+        del request.session['uid']
+    if request.session['username']:
+        del request.session['username']
+
+    return resq
 
