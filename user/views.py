@@ -1,6 +1,6 @@
 import hashlib
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from .models import User
 
@@ -45,5 +45,57 @@ def reg_view(request):
     request.session['uid']=user.id
 
 
-    return HttpResponse('注册成功')
+    return HttpResponseRedirect('/index')
+
+
+def login_view(request):
+
+    if request.method == 'GET':
+        #获取登录页面
+        #检查登录状态，如果登录了，显示已登录
+        if request.session.get('username') and request.session.get('uid'):
+            return HttpResponseRedirect('/index')
+        #检查cookies
+        c_username=request.COOKIES.get('username')
+        c_uid=request.COOKIES.get('uid')
+        if c_username and c_uid:
+            #回写session
+            request.session['username']=c_username
+            request.session['uid']=c_uid
+            return HttpResponseRedirect('/index')
+
+        return render(request,'user/login.html')
+
+    elif request.method == 'POST':
+        #处理数据
+        username=request.POST['username']
+        password=request.POST['password']
+
+        try:
+            user=User.objects.get(username=username)
+        except Exception as e:
+            print('--login user error %s'%(e))
+            return HttpResponse('用户名或密码错误')
+        m = hashlib.md5()
+        m.update(password.encode())
+        if m.hexdigest() != user.password:
+            return HttpResponse('用户名或密码错误')
+        #记录会话状态
+
+        request.session['username']=username
+        request.session['uid']=user.id
+
+        resp=HttpResponseRedirect('/index')
+        #判断用户是否勾选了记住用户名
+        if 'remember' in request.POST:
+        #如果勾选了，则设置Cookies
+            resp.set_cookie('uid',user.id,3600*24*3)
+            resp.set_cookie('username',username,3600*24*3)
+
+
+        return resp
+
+def logout_view(request):
+    
+    return HttpResponseRedirect('/index')
 
