@@ -100,9 +100,8 @@ def logout_view(request):
     resq.delete_cookie('username')
     resq.delete_cookie('uid')
 
-    if request.session['uid']:
+    if request.session.get('username') and request.session.get('uid'):
         del request.session['uid']
-    if request.session['username']:
         del request.session['username']
 
     return resq

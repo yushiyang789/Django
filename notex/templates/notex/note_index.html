@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>笔记列表</title>
+</head>
+<body>
+<p>
+    {{ username }}    <a href="/user/logout">退出登录</a>
+</p>
+<table border="1">
+{% for note in notes %}
+<tr>
+    <td>
+        <form action="" method="post" name="title">
+            {{ note.title }}
+        </form>
+    </td>
+    <td>
+        <form action="/notex/del" method="post" name="id" value="1">
+
+            <input type="submit" value="删除">
+        </form>
+    </td>
+    <td>
+        <form action="" method="post" name="title" value="查看">
+            {{ note.id }}
+        </form>
+    </td>
+
+</tr>
+
+{% empty %}
+
+<p>您还没有写过日记，快去写一篇吧！</p>
+
+
+{% endfor %}
+</table>
+</body>
+</html>
